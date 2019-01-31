@@ -2,16 +2,18 @@ def go_go_template!
   add_template_repository_to_source_path
 
   # default install variables
-  @tailwindcss = true
+  @tailwindcss  = true
+  @devise       = true
 
   gather_user_input
   add_gems
 
   after_bundle do
     install_webpack
+    install_devise
     install_tailwindcss
 
-    create_and_migrage_db
+    create_and_migrate_db
     initial_project_commit_and_branch
   end
 end
@@ -19,15 +21,24 @@ end
 def gather_user_input
   return if no?('Would you like to customize any of the setup?')
 
+  add_devise
   add_tailwindcss
 end
 
+def add_devise
+  @devise = yes?('Do you want to add Devise?') ? @devise : false
+end
+
 def add_tailwindcss
-  @tailwindcss = yes?('Would you like to add TailwindCSS?') ? @tailwindcss : nil
+  @tailwindcss = yes?('Would you like to add TailwindCSS?') ? @tailwindcss : false
 end
 
 def add_tailwindcss?
   @tailwindcss.present?
+end
+
+def add_devise?
+  @devise
 end
 
 def add_webpack?
@@ -35,6 +46,7 @@ def add_webpack?
 end
 
 def add_gems
+  gem 'devise'    if add_devise?
   gem 'webpacker' if add_webpack?
 end
 
@@ -42,6 +54,35 @@ def install_webpack
   return unless add_webpack?
 
   rails_command 'webpacker:install'
+end
+
+def install_devise
+  return unless add_devise?
+
+  generate "devise:install"
+  generate "devise", 'User'
+  inject_into_file 'config/environments/development.rb',
+    after: "config.action_mailer.perform_caching = false\n" do <<-RUBY
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+    RUBY
+  end
+
+  inject_into_file 'config/environments/test.rb',
+    after: "config.action_mailer.perform_caching = false\n" do <<-RUBY
+
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+    RUBY
+  end
+
+  add_marketing_homepage
+
+  route "root to: 'marketing_page#index'"
+end
+
+def add_marketing_homepage
+  copy_file 'app/controllers/marketing_page_controller.rb'
+  copy_file 'app/views/marketing_page/index.html.erb'
 end
 
 def install_tailwindcss
@@ -76,7 +117,7 @@ import "../css/tailwind.css";
   end
 end
 
-def create_and_migrage_db
+def create_and_migrate_db
   rake 'db:create'
   rake 'db:migrate'
 end
