@@ -2,16 +2,19 @@ def go_go_template!
   add_template_repository_to_source_path
 
   # default install variables
-  @tailwindcss  = true
-  @devise       = true
+  @tailwindcss    = true
+  @devise         = true
+  @js_framework   = 'react'
 
   gather_user_input
   add_gems
+  use_js_not_coffee
 
   after_bundle do
     install_webpack
     install_devise
     install_tailwindcss
+    install_js_framework
 
     create_and_migrate_db
     initial_project_commit_and_branch
@@ -23,6 +26,7 @@ def gather_user_input
 
   add_devise
   add_tailwindcss
+  add_js_framework
 end
 
 def add_devise
@@ -33,8 +37,17 @@ def add_tailwindcss
   @tailwindcss = yes?('Would you like to add TailwindCSS?') ? @tailwindcss : false
 end
 
+def add_js_framework
+  @js_framework = ask('Would you like a JS Framework?',
+                      limited_to: %w[angular react elm stimulus none])
+end
+
 def add_tailwindcss?
   @tailwindcss.present?
+end
+
+def add_js_framework?
+  @js_framework != 'none'
 end
 
 def add_devise?
@@ -48,6 +61,15 @@ end
 def add_gems
   gem 'devise'    if add_devise?
   gem 'webpacker' if add_webpack?
+end
+
+def use_js_not_coffee
+  inject_into_file 'config/application.rb',
+    after: "config.load_defaults 5.2\n" do <<-RUBY
+
+    config.generators.javascript_engine = :js
+    RUBY
+  end
 end
 
 def install_webpack
@@ -115,6 +137,12 @@ import "../css/tailwind.css";
   tailwindcss: './app/javascript/css/tailwind.js'
     RUBY
   end
+end
+
+def install_js_framework
+  return unless add_js_framework?
+
+  run "bundle exec rails webpacker:install:#{@js_framework}"
 end
 
 def create_and_migrate_db
