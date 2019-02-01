@@ -1,3 +1,5 @@
+Dir[File.join(__dir__, 'install', '*.rb')].each { |file| require file }
+
 def go_go_template!
   add_template_repository_to_source_path
 
@@ -72,77 +74,9 @@ def use_js_not_coffee
   end
 end
 
-def install_webpack
-  return unless add_webpack?
-
-  rails_command 'webpacker:install'
-end
-
-def install_devise
-  return unless add_devise?
-
-  generate "devise:install"
-  generate "devise", 'User'
-  inject_into_file 'config/environments/development.rb',
-    after: "config.action_mailer.perform_caching = false\n" do <<-RUBY
-
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
-    RUBY
-  end
-
-  inject_into_file 'config/environments/test.rb',
-    after: "config.action_mailer.perform_caching = false\n" do <<-RUBY
-
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
-    RUBY
-  end
-
-  add_marketing_homepage
-
-  route "root to: 'marketing_page#index'"
-end
-
 def add_marketing_homepage
   copy_file 'app/controllers/marketing_page_controller.rb'
   copy_file 'app/views/marketing_page/index.html.erb'
-end
-
-def install_tailwindcss
-  return unless add_tailwindcss?
-
-  run 'yarn add tailwindcss --dev'
-  run './node_modules/.bin/tailwind init app/javascript/css/tailwind.js'
-  copy_file 'app/javascript/css/tailwind.css'
-  insert_into_file 'app/views/layouts/application.html.erb',
-                   before: "</head>\n" do
-    <<-RUBY
-  <%= javascript_pack_tag 'application' %>
-    <%= stylesheet_pack_tag 'application' %>
-    RUBY
-  end
-
-  insert_into_file 'app/javascript/packs/application.js',
-                   before: "console.log('Hello World from Webpacker')\n" do
-    <<-RUBY
-import "../css/tailwind.css";
-    RUBY
-  end
-
-  gsub_file "app/javascript/packs/application.js",
-            /console.log\('Hello World from Webpacker'\)\n/, ''
-
-  insert_into_file '.postcssrc.yml',
-                   after: "postcss-import: {}\n" do
-    <<-RUBY
-  tailwindcss: './app/javascript/css/tailwind.js'
-    RUBY
-  end
-end
-
-def install_js_framework
-  return unless add_js_framework?
-
-  run "bundle exec rails webpacker:install:#{@js_framework}"
 end
 
 def create_and_migrate_db
