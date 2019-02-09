@@ -1,0 +1,65 @@
+module Users
+  class OmniauthCallbacksController < Devise::OmniauthCallbacksController
+    before_action :set_identity
+    before_action :set_user
+
+    attr_reader :identity, :user
+
+    def handle_auth
+      if identity.present?
+        identity.update(identity_attrs)
+      else
+        user.identities.create(identity_attrs)
+      end
+
+      if user_signed_in?
+        flash[:notice] = "Your #{auth.provider} account was connected."
+        redirect_to edit_user_registration_path
+      else
+        sign_in_and_redirect user, event: :authentication
+        set_flash_message :notice, :success, kind: auth.provider
+      end
+    end
+    <% providers.each do |provider| %>
+    alias <%= provider %> handle_auth
+    <% end %>
+    private
+
+    def auth
+      request.env['omniauth.auth']
+    end
+
+    def set_identity
+      @identity = Identity.where(provider: auth.provider, uid: auth.uid).first
+    end
+
+    def set_user
+      if user_signed_in?
+        @user = current_user
+      elsif identity.present?
+        @user = identity.user
+      elsif User.where(email: auth.info.email).any?
+        flash[:alert] = "An account with this email already exists. Please sign in with that account before connecting your #{auth.provider.titleize} account."
+        redirect_to new_user_session_path
+      else
+        @user = create_user
+      end
+    end
+
+    def identity_attrs
+      {
+        provider: auth.provider,
+        uid: auth.uid,
+        access_token: auth.credentials.token,
+        access_token_secret: auth.credentials.secret,
+      }
+    end
+
+    def create_user
+      User.create(
+        email: auth.info.email,
+        password: Devise.friendly_token[0,20]
+      )
+    end
+  end
+end

@@ -4,12 +4,18 @@ def go_go_template!
   add_template_repository_to_source_path
 
   # default install variables
-  @tailwindcss    = true
-  @devise         = true
-  @js_framework   = 'react'
+  @tailwindcss        = true
+  @devise             = true
+  @js_framework       = 'react'
+  @omniauth           = true
+  @omniauth_twitter   = true
+  @omniauth_google    = true
+  @omniauth_facebook  = true
 
   gather_user_input
+
   add_gems
+
   use_js_not_coffee
 
   after_bundle do
@@ -18,30 +24,49 @@ def go_go_template!
     install_tailwindcss
     install_js_framework
 
-    create_and_migrate_db
+    create_db
+    migrate_db
+    stop_spring
+
+    install_omniauth
+
+    migrate_db
     initial_project_commit_and_branch
   end
+end
+
+def stop_spring
+  run 'spring stop'
 end
 
 def gather_user_input
   return if no?('Would you like to customize any of the setup?')
 
-  add_devise
-  add_tailwindcss
-  add_js_framework
+  input_add_devise
+  input_add_tailwindcss
+  input_add_js_framework
+  input_add_omniauth
 end
 
-def add_devise
+def input_add_devise
   @devise = yes?('Do you want to add Devise?') ? @devise : false
 end
 
-def add_tailwindcss
+def input_add_tailwindcss
   @tailwindcss = yes?('Would you like to add TailwindCSS?') ? @tailwindcss : false
 end
 
-def add_js_framework
+def input_add_js_framework
   @js_framework = ask('Would you like a JS Framework?',
                       limited_to: %w[angular react elm stimulus none])
+end
+
+def input_add_omniauth
+  return @omniauth = false unless yes?('Would you like to add Omniauth?')
+
+  @omniauth_twitter   = yes?('Would you like to add Twitter Omniauth?') ? @omniauth_twitter : false
+  @omniauth_google    = yes?('Would you like to add Google Omniauth?') ? @omniauth_google : false
+  @omniauth_facebook  = yes?('Would you like to add Facebook Omniauth?') ? @omniauth_facebook : false
 end
 
 def add_tailwindcss?
@@ -60,11 +85,6 @@ def add_webpack?
   add_tailwindcss?
 end
 
-def add_gems
-  gem 'devise'    if add_devise?
-  gem 'webpacker' if add_webpack?
-end
-
 def use_js_not_coffee
   inject_into_file 'config/application.rb',
     after: "config.load_defaults 5.2\n" do <<-RUBY
@@ -74,13 +94,11 @@ def use_js_not_coffee
   end
 end
 
-def add_marketing_homepage
-  copy_file 'app/controllers/marketing_page_controller.rb'
-  copy_file 'app/views/marketing_page/index.html.erb'
+def create_db
+  rake 'db:create'
 end
 
-def create_and_migrate_db
-  rake 'db:create'
+def migrate_db
   rake 'db:migrate'
 end
 
