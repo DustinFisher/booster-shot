@@ -4,6 +4,7 @@ def go_go_template!
   add_template_repository_to_source_path
 
   # default install variables
+  @rspec              = true
   @tailwindcss        = true
   @devise             = true
   @js_framework       = 'react'
@@ -19,6 +20,7 @@ def go_go_template!
   use_js_not_coffee
 
   after_bundle do
+    install_rspec
     install_webpack
     install_devise
     install_tailwindcss
@@ -67,6 +69,10 @@ def input_add_omniauth
   @omniauth_twitter   = yes?('Would you like to add Twitter Omniauth?') ? @omniauth_twitter : false
   @omniauth_google    = yes?('Would you like to add Google Omniauth?') ? @omniauth_google : false
   @omniauth_facebook  = yes?('Would you like to add Facebook Omniauth?') ? @omniauth_facebook : false
+end
+
+def add_rspec?
+  @rspec
 end
 
 def add_tailwindcss?
