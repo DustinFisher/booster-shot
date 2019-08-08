@@ -3,10 +3,10 @@ def install_default_style
 
   inject_into_file 'app/views/layouts/application.html.erb',
     before: "<%= yield %>\n" do <<-RUBY
-    <div class="container mx-auto">
+  <div class="container mx-auto">
     RUBY
   end
-  
+
   inject_into_file 'app/views/layouts/application.html.erb',
     after: "<%= yield %>\n" do <<-RUBY
     </div>
