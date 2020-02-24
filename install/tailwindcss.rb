@@ -1,5 +1,5 @@
 def install_tailwindcss
-  return unless add_tailwindcss?
+  return unless add_base_style? || add_tailwindcss?
 
   run 'yarn add tailwindcss --dev'
   copy_file 'app/javascript/css/tailwind.scss'

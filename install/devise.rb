@@ -31,6 +31,8 @@ def devise_action_mailer_test_config
 end
 
 def add_basic_sign_up_in_links
+  return if add_base_style?
+
   directory 'app/views/devise/menu'
   inject_into_file 'app/views/layouts/application.html.erb',
     after: "<body>\n" do <<-RUBY
@@ -41,6 +43,8 @@ def add_basic_sign_up_in_links
 end
 
 def add_basic_flash_messages
+  return if add_base_style?
+
   inject_into_file 'app/views/layouts/application.html.erb',
     after: "<body>\n" do <<-RUBY
     <p class="notice"><%= notice %></p>

@@ -3,6 +3,8 @@ Dir[File.join(__dir__, 'install', '*.rb')].each { |file| require file }
 def go_go_template!
   add_template_repository_to_source_path
 
+  @question_color = "\e[34m"
+
   # default install variables
   @rspec              = true
   @tailwindcss        = true
@@ -13,6 +15,7 @@ def go_go_template!
   @omniauth_facebook  = true
   @action_text        = true
   @mobile_friendly    = true
+  @base_style         = true
   @js_framework       = 'react'
 
   gather_user_input
@@ -21,12 +24,12 @@ def go_go_template!
 
   after_bundle do
     install_rspec
-    install_webpack
     install_devise
     install_tailwindcss
     install_js_framework
     install_action_text
     install_mobile_friendly_tag
+    install_base_style
 
     create_db
     migrate_db
@@ -44,43 +47,52 @@ def stop_spring
 end
 
 def gather_user_input
-  return if no?('Would you like to customize any of the setup?')
+  return if no?('Would you like to customize any of the setup?', @question_color)
 
   input_add_devise
-  input_add_tailwindcss
+  input_add_base_style
+  input_add_tailwindcss unless @base_style
   input_add_js_framework
   input_add_omniauth
   input_add_action_text
-  input_add_mobile_friendly_tag
 end
 
 def input_add_devise
-  @devise = yes?('Do you want to add Devise?') ? @devise : false
+  @devise = yes?('Do you want to add Devise?', @question_color) ? @devise : false
+end
+
+def input_add_base_style
+  @base_style = yes?('Would you like to add base styling?', @question_color) ? @base_style : false
 end
 
 def input_add_tailwindcss
-  @tailwindcss = yes?('Would you like to add TailwindCSS?') ? @tailwindcss : false
+  @tailwindcss = yes?('Would you like to add TailwindCSS?', @question_color) ? @tailwindcss : false
 end
 
 def input_add_js_framework
   @js_framework = ask('Would you like a JS Framework?',
+                      @question_color,
                       limited_to: %w[angular react elm stimulus none])
 end
 
 def input_add_omniauth
-  return @omniauth = false unless yes?('Would you like to add Omniauth?')
+  @omniauth = false unless yes?('Would you like to add Omniauth?', @question_color)
 
-  @omniauth_twitter   = yes?('Would you like to add Twitter Omniauth?') ? @omniauth_twitter : false
-  @omniauth_google    = yes?('Would you like to add Google Omniauth?') ? @omniauth_google : false
-  @omniauth_facebook  = yes?('Would you like to add Facebook Omniauth?') ? @omniauth_facebook : false
+  unless @omniauth
+    @omniauth_twitter = false
+    @omniauth_facebook = false
+    @omniauth_google = false
+  end
+
+  return unless @omniauth
+
+  @omniauth_twitter   = yes?('Would you like to add Twitter Omniauth?', @question_color) ? @omniauth_twitter : false
+  @omniauth_google    = yes?('Would you like to add Google Omniauth?', @question_color) ? @omniauth_google : false
+  @omniauth_facebook  = yes?('Would you like to add Facebook Omniauth?', @question_color) ? @omniauth_facebook : false
 end
 
 def input_add_action_text
-  @action_text = yes?('Would you like to add Action Text?') ? @action_text : false
-end
-
-def input_add_mobile_friendly_tag
-  @mobile_friendly = yes?('Will this site be mobile friendly?') ? @mobile_friendly : false
+  @action_text = yes?('Would you like to add Action Text?', @question_color) ? @action_text : false
 end
 
 def add_rspec?
@@ -88,7 +100,11 @@ def add_rspec?
 end
 
 def add_tailwindcss?
-  @tailwindcss.present?
+  @tailwindcss
+end
+
+def add_base_style?
+  @base_style
 end
 
 def add_js_framework?
@@ -99,12 +115,8 @@ def add_devise?
   @devise
 end
 
-def add_webpack?
-  add_tailwindcss?
-end
-
-def add_mobile_friendly_tag?
-  @mobile_friendly
+def add_action_text?
+  @action_text
 end
 
 def create_db

@@ -1,0 +1,51 @@
+.menu-icon:hover {
+  @apply border-gray-600;
+}
+
+.menu-icon {
+  @apply cursor-pointer block relative py-3 px-2 border rounded border-gray-500;
+
+  .toggle-icon {
+    @apply w-4 relative block bg-gray-500;
+    height: 1px;
+  }
+
+  .toggle-icon:before,
+  .toggle-icon:after {
+    @apply bg-gray-500 block h-full absolute w-full ease-out;
+    content: "";
+  }
+
+  .toggle-icon:before {
+    @apply top-0 mt-1;
+  }
+
+  .toggle-icon:after {
+    @apply top-0 -mt-1;
+  }
+}
+
+#menu-toggle:checked ~ .menu-icon .toggle-icon {
+  @apply bg-transparent;
+}
+
+#menu-toggle:checked ~ .menu-icon .toggle-icon:before {
+  @apply transform -rotate-45;
+}
+
+#menu-toggle:checked ~ .menu-icon .toggle-icon:after {
+  @apply transform rotate-45;
+}
+
+#menu-toggle:checked ~ .menu-icon:not(.steps) .toggle-icon:before,
+#menu-toggle:checked ~ .menu-icon:not(.steps) .toggle-icon:after {
+  @apply mt-0;
+}
+
+#menu-toggle:checked ~ #menu {
+  @apply block;
+}
+
+.account-items {
+  @apply hidden pt-4 w-full;
+}
