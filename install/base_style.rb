@@ -3,6 +3,8 @@ def install_base_style
 
   add_menutoggle_css
   add_application_layout_style
+  add_devise_custom_views
+  change_devise_locales
 end
 
 def add_menutoggle_css
@@ -50,11 +52,24 @@ def add_application_layout_style
       </div>
     </header>
     <div class="content m-4">
-      <p class="notice"><%= notice %></p>
-      <p class="alert"><%= alert %></p>
+      <p class="notice text-center text-blue-600 text-xl"><%= notice %></p>
+      <p class="alert text-center text-red-600 text-xl"><%= alert %></p>
       <%= yield %>
     </div>
   </body>
     RUBY
+  end
+
+  def add_devise_custom_views
+    directory 'app/views/devise'
+  end
+
+  def change_devise_locales
+    gsub_file "config/locales/devise.en.yml",
+              /"1 error prohibited this %{resource} from being saved:"/,
+              '"1 error occurred:"'
+    gsub_file "config/locales/devise.en.yml",
+              /"%{count} errors prohibited this %{resource} from being saved:"/,
+              '"%{count} errors occurred:"'
   end
 end

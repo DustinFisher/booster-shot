@@ -4,7 +4,6 @@ def install_mobile_friendly_tag
     <<-RUBY
 
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
     RUBY
   end
 end

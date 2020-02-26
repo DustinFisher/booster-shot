@@ -7,4 +7,7 @@ def add_gems
   gem_group :development, :test do
     gem 'rspec-rails' if add_rspec?
   end
+  gem 'bullet', group: 'development'
+  gem 'brakeman', group: 'development'
+  gem 'strong_migrations'
 end

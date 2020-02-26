@@ -6,7 +6,7 @@ def install_tailwindcss
   insert_into_file 'app/views/layouts/application.html.erb',
                    before: "</head>\n" do
     <<-RUBY
-    <%= stylesheet_pack_tag 'application' %>
+  <%= stylesheet_pack_tag 'application' %>
     RUBY
   end
 
