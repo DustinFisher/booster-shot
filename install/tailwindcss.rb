@@ -4,7 +4,7 @@ def install_tailwindcss
   run 'yarn add tailwindcss --dev'
   copy_file 'app/javascript/css/tailwind.scss'
   insert_into_file 'app/views/layouts/application.html.erb',
-                   before: "</head>\n" do
+                   before: "</head>" do
     <<-RUBY
   <%= stylesheet_pack_tag 'application' %>
     RUBY

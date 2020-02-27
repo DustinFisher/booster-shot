@@ -24,7 +24,7 @@ def add_application_layout_style
   <body>
     <header class="flex flex-wrap items-center w-full shadow p-4">
       <div class="flex-1 flex justify-between items-center text-xl">
-        Booster Shot
+        <%= link_to 'Booster Shot', root_path %>
       </div>
 
       <input class="hidden" type="checkbox" id="menu-toggle" />
