@@ -12,10 +12,6 @@
           <%= f.password_field :password, autocomplete: "new-password", placeholder: "Password", class: 'block border border-gray-300 w-full p-3 rounded mb-4' %>
         </div>
 
-        <div class="field">
-          <%= f.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm Password", class: 'block border border-gray-300 w-full p-3 rounded mb-4' %>
-        </div>
-
         <% if devise_mapping.rememberable? %>
           <div class="field mb-2">
             <%= f.check_box :remember_me %>

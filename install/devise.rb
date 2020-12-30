@@ -8,8 +8,14 @@ def install_devise
   add_basic_sign_up_in_links
   add_basic_flash_messages
   add_marketing_homepage
+  add_user_home_controller
 
   route "root to: 'marketing_page#index'"
+  route <<-ROUTE
+    authenticated :user do
+      root 'users/home#index', as: :authenticated_root
+    end
+  ROUTE
 end
 
 def devise_action_mailer_dev_config
@@ -56,4 +62,9 @@ end
 def add_marketing_homepage
   copy_file 'app/controllers/marketing_page_controller.rb'
   copy_file 'app/views/marketing_page/index.html.erb'
+end
+
+def add_user_home_controller
+  copy_file 'app/controllers/users/home_controller.rb'
+  copy_file 'app/views/users/home/index.html.erb'
 end

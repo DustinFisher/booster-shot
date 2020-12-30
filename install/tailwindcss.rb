@@ -1,7 +1,7 @@
 def install_tailwindcss
   return unless add_base_style? || add_tailwindcss?
 
-  run 'yarn add tailwindcss --dev'
+  run 'yarn add tailwindcss@comp'
   copy_file 'app/javascript/css/tailwind.scss'
   insert_into_file 'app/views/layouts/application.html.erb',
                    before: "</head>" do
@@ -11,9 +11,9 @@ def install_tailwindcss
   end
 
   insert_into_file 'app/javascript/packs/application.js',
-                   after: "require(\"channels\")\n" do
+                   after: "import \"channels\"\n" do
     <<-RUBY
-require("css/tailwind.scss")
+import "css/tailwind.scss"
     RUBY
   end
 

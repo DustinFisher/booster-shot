@@ -9,14 +9,15 @@ def go_go_template!
   @rspec              = true
   @tailwindcss        = true
   @devise             = true
-  @omniauth           = true
-  @omniauth_twitter   = true
-  @omniauth_google    = true
-  @omniauth_facebook  = true
-  @action_text        = true
   @mobile_friendly    = true
   @base_style         = true
-  @js_framework       = 'react'
+  @stimulus_reflex    = false
+  @omniauth           = false
+  @omniauth_twitter   = false
+  @omniauth_google    = false
+  @omniauth_facebook  = false
+  @action_text        = false
+  @js_framework       = 'stimulus'
 
   gather_user_input
 
@@ -27,6 +28,7 @@ def go_go_template!
     install_devise
     install_tailwindcss
     install_js_framework
+    install_stimulus_reflex
     install_action_text
     install_mobile_friendly_tag
     install_base_style
@@ -38,6 +40,7 @@ def go_go_template!
     install_omniauth
 
     migrate_db
+    organize_gemfile
     initial_project_commit_and_branch
   end
 end
@@ -53,6 +56,7 @@ def gather_user_input
   input_add_base_style
   input_add_tailwindcss unless @base_style
   input_add_js_framework
+  input_add_stimulus_reflex if using_stimulus?
   input_add_omniauth
   input_add_action_text
 end
@@ -70,6 +74,7 @@ def input_add_tailwindcss
 end
 
 def input_add_js_framework
+  @stimulus_reflex = false
   @js_framework = ask('Would you like a JS Framework?',
                       @question_color,
                       limited_to: %w[angular react elm stimulus none])
@@ -93,6 +98,10 @@ end
 
 def input_add_action_text
   @action_text = yes?('Would you like to add Action Text?', @question_color) ? @action_text : false
+end
+
+def input_add_stimulus_reflex
+  @stimulus_reflex = yes?('Would you like to add Stimulus Reflex?', @question_color) ? @stimulus_reflex : false
 end
 
 def add_rspec?
@@ -119,12 +128,24 @@ def add_action_text?
   @action_text
 end
 
+def add_stimulus_reflex?
+  @stimulus_reflex
+end
+
+def using_stimulus?
+  @js_framework == 'stimulus'
+end
+
 def create_db
   rails_command 'db:create'
 end
 
 def migrate_db
   rails_command 'db:migrate'
+end
+
+def organize_gemfile
+  run 'happy_gemfile all'
 end
 
 def initial_project_commit_and_branch
@@ -136,11 +157,11 @@ end
 
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
-    source_paths.unshift(tempdir = Dir.mktmpdir('booster-shot-'))
+    source_paths.unshift(tempdir = Dir.mktmpdir('tinkerer-'))
     at_exit { FileUtils.remove_entry(tempdir) }
     git clone: [
       '--quiet',
-      'https://github.com/dustinfisher/booster-shot.git',
+      'https://github.com/dustinfisher/tinkerer-shot.git',
       tempdir
     ].map(&:shellescape).join(' ')
   else
