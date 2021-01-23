@@ -1,8 +1,6 @@
+
 def go_go_template!
   add_template_repository_to_source_path
-
-  project_root = File.dirname(File.absolute_path(__FILE__))
-  Dir.glob(project_root + '/install/*') {|file| require file}
 
   @question_color = "\e[34m"
 
@@ -165,8 +163,11 @@ def add_template_repository_to_source_path
       'https://github.com/dustinfisher/tinkerer.git',
       tempdir
     ].map(&:shellescape).join(' ')
+
+    Dir[File.join(tempdir, 'install', '*.rb')].each { |file| require file }
   else
     source_paths.unshift(File.dirname(__FILE__))
+    Dir[File.join(__dir__, 'install', '*.rb')].each { |file| require file }
   end
 end
 
