@@ -154,6 +154,8 @@ def initial_project_commit_and_branch
   git checkout: "-b development"
 end
 
+# Pulled this function from https://github.com/mattbrictson/rails-template
+# and modified it for including install files
 def add_template_repository_to_source_path
   if __FILE__ =~ %r{\Ahttps?://}
     source_paths.unshift(tempdir = Dir.mktmpdir('tinkerer-'))
