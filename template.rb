@@ -1,7 +1,8 @@
 def go_go_template!
   add_template_repository_to_source_path
 
-  Dir[File.join(__dir__, 'install', '*.rb')].each { |file| require file }
+  project_root = File.dirname(File.absolute_path(__FILE__))
+  Dir.glob(project_root + '/install/*') {|file| require file}
 
   @question_color = "\e[34m"
 
