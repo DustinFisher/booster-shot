@@ -38,7 +38,7 @@ def add_application_layout_style
               <%= link_to('Edit registration', edit_user_registration_path) %>
             </li>
             <li>
-              <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
+              <%= button_to('Logout', destroy_user_session_path, method: :delete, class: 'bg-transparent cursor-pointer') %>
             </li>
           <% else %>
             <li class="mr-6">

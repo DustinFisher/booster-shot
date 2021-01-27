@@ -3,6 +3,7 @@ def add_gems
   gem 'omniauth-facebook'       if add_omniauth_facebook?
   gem 'omniauth-google-oauth2'  if add_omniauth_google?
   gem 'omniauth-twitter'        if add_omniauth_twitter?
+  gem 'hotwire-rails'           if add_hotwire?
   gem 'stimulus_reflex'         if add_stimulus_reflex?
   gem 'strong_migrations'
 

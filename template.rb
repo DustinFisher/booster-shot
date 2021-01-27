@@ -10,13 +10,14 @@ def go_go_template!
   @devise             = true
   @mobile_friendly    = true
   @base_style         = true
+  @hotwire            = true
   @stimulus_reflex    = false
   @omniauth           = false
   @omniauth_twitter   = false
   @omniauth_google    = false
   @omniauth_facebook  = false
   @action_text        = false
-  @js_framework       = 'stimulus'
+  @js_framework       = 'none'
 
   gather_user_input
 
@@ -31,6 +32,7 @@ def go_go_template!
     install_action_text
     install_mobile_friendly_tag
     install_base_style
+    install_hotwire
 
     create_db
     migrate_db
@@ -54,6 +56,7 @@ def gather_user_input
   input_add_devise
   input_add_base_style
   input_add_tailwindcss unless @base_style
+  input_add_hotwire
   input_add_js_framework
   input_add_stimulus_reflex if using_stimulus?
   input_add_omniauth
@@ -72,8 +75,13 @@ def input_add_tailwindcss
   @tailwindcss = yes?('Would you like to add TailwindCSS?', @question_color) ? @tailwindcss : false
 end
 
+def input_add_hotwire
+  @hotwire = yes?('Would you like to add Hotwire?', @question_color) ? true : false
+end
+
 def input_add_js_framework
-  @stimulus_reflex = false
+  return if add_hotwire?
+
   @js_framework = ask('Would you like a JS Framework?',
                       @question_color,
                       limited_to: %w[angular react elm stimulus none])
@@ -100,6 +108,8 @@ def input_add_action_text
 end
 
 def input_add_stimulus_reflex
+  return if add_hotwire?
+
   @stimulus_reflex = yes?('Would you like to add Stimulus Reflex?', @question_color) ? @stimulus_reflex : false
 end
 
@@ -133,6 +143,10 @@ end
 
 def using_stimulus?
   @js_framework == 'stimulus'
+end
+
+def add_hotwire?
+  @hotwire
 end
 
 def create_db
