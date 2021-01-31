@@ -6,6 +6,8 @@ def add_gems
   gem 'hotwire-rails'           if add_hotwire?
   gem 'stimulus_reflex'         if add_stimulus_reflex?
   gem 'strong_migrations'
+  gem 'bundler-audit'
+  gem 'lograge'
 
   gem_group :development, :test do
     gem 'rspec-rails' if add_rspec?

@@ -151,7 +151,11 @@ def add_hotwire?
 end
 
 def add_bin_setup
+  copy_file 'app/README.md', 'README.md', force: true
   copy_file 'bin/setup', force: true
+  copy_file 'bin/run'
+  copy_file 'bin/ci'
+  run 'chmod +x bin/run bin/ci'
 end
 
 def create_db
