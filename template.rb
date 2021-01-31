@@ -41,6 +41,7 @@ def go_go_template!
     install_omniauth
 
     migrate_db
+    add_bin_setup
     organize_gemfile
     initial_project_commit_and_branch
   end
@@ -147,6 +148,10 @@ end
 
 def add_hotwire?
   @hotwire
+end
+
+def add_bin_setup
+  copy_file 'bin/setup', force: true
 end
 
 def create_db
